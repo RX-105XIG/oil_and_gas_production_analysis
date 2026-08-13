@@ -20,7 +20,7 @@ Key Findings
 The top 10% of leases (by oil production) account for 76.71% of total oil production across the county.
 
 2. Top single lease significantly outproduces the rest of the field
-REV GF STATE T7 50 was the top-producing lease with 4,440,186 barrels of oil over the period — roughly 19.88x the county average of 223,343 barrels per lease.
+REV GF STATE T7 50 was the top-producing lease with 4440186 barrels of oil over the period — roughly 19.88x the county average of 223343 barrels per lease.
 
 3. Zero-production leases are largely disposal/injection wells, not inactive producers
 1275 leases (21.39% of the dataset) showed zero recorded oil, gas, and condensate production. Of these, 14.20% had lease names containing "SWD" or "BRINE," consistent with these being saltwater disposal or brine injection wells rather than producing wells that went inactive.
