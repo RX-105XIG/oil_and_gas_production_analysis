@@ -11,60 +11,24 @@ Query criteria: Lease level view, Well Type: Both, County: Reeves, Date Range: J
 Rows: ~5,962 leases (each row is a 5 year cumulative total per lease)
 Note on scope: this dataset reflects cumulative totals per lease rather than monthly production, and does not include an operator field. As a result, this analysis focuses on cross-sectional comparisons (rankings, ratios, concentration) rather than time-series trends.
 
-Schema
-CREATE TABLE reeves_leases (
-    lease_name VARCHAR(100),
-    lease_no VARCHAR(20),
-    district_no VARCHAR(5),
-    well_no VARCHAR(20),
-    oil_bbl INT,
-    casinghead_mcf INT,
-    gw_gas_mcf INT,
-    condensate_bbl INT
-);
 
 Tools
 MySQL / MySQL Workbench, Excel (data cleaning + charts)
 
 Key Findings
 1. Production is highly concentrated among a small number of leases
-The top 10% of leases (by oil production) account for [X]% of total oil production across the county.
-WITH ranked AS (
-    SELECT lease_name, oil_bbl,
-           NTILE(10) OVER (ORDER BY oil_bbl DESC) AS decile
-    FROM reeves_leases
-)
-SELECT
-    (SELECT SUM(oil_bbl) FROM ranked WHERE decile = 1) /
-    (SELECT SUM(oil_bbl) FROM reeves_leases) * 100 AS pct_from_top_decile;
+The top 10% of leases (by oil production) account for 76.71% of total oil production across the county.
 
 2. Top single lease significantly outproduces the rest of the field
-[Lease name, e.g. REV GF STATE T7 50] was the top-producing lease with [X] barrels of oil over the period — roughly [X]x the county average of [X] barrels per lease.
-SELECT lease_name, lease_no, oil_bbl
-FROM reeves_leases
-ORDER BY oil_bbl DESC
-LIMIT 20;
+REV GF STATE T7 50 was the top-producing lease with 4,440,186 barrels of oil over the period — roughly 19.88x the county average of 223,343 barrels per lease.
 
 3. Zero-production leases are largely disposal/injection wells, not inactive producers
-[X] leases ([X]% of the dataset) showed zero recorded oil, gas, and condensate production. Of these, [X]% had lease names containing "SWD" or "BRINE," consistent with these being saltwater disposal or brine injection wells rather than producing wells that went inactive.
-SELECT COUNT(*) AS total_zero_production
-FROM reeves_leases
-WHERE oil_bbl = 0 AND casinghead_mcf = 0 AND gw_gas_mcf = 0 AND condensate_bbl = 0;
-
-SELECT COUNT(*) AS zero_production_swd_brine
-FROM reeves_leases
-WHERE (oil_bbl = 0 AND casinghead_mcf = 0 AND gw_gas_mcf = 0 AND condensate_bbl = 0)
-  AND (lease_name LIKE '%SWD%' OR lease_name LIKE '%BRINE%');
+1275 leases (21.39% of the dataset) showed zero recorded oil, gas, and condensate production. Of these, 14.20% had lease names containing "SWD" or "BRINE," consistent with these being saltwater disposal or brine injection wells rather than producing wells that went inactive.
 
 4. Gas-to-oil ratio varies widely across leases
-The highest gas-to-oil ratio (GOR) lease was [lease name] at [X] mcf per barrel, suggesting a more gas-dominant reservoir compared to typical oil-weighted leases in the sample.
-SELECT lease_name, lease_no, oil_bbl,
-       (casinghead_mcf + gw_gas_mcf) AS total_gas_mcf,
-       ROUND((casinghead_mcf + gw_gas_mcf) / oil_bbl, 2) AS gas_oil_ratio
-FROM reeves_leases
-WHERE oil_bbl > 0
-ORDER BY gas_oil_ratio DESC
-LIMIT 20;
+The highest gas-to-oil ratio (GOR) lease was BIG GEORGE 180 at 56.26 mcf per barrel, suggesting a more gas-dominant reservoir compared to typical oil-weighted leases in the sample.
+Note: leases with very low oil volumes were excluded from this ranking (oil_bbl > 100), since dividing by a near-zero denominator produces extreme ratios that don't reflect actual reservoir characteristics rather than a genuinely gas-rich lease.
+
 
 Full Query File
 See queries.sql for all 8 queries used in this analysis, including summary statistics and multi-well lease comparisons.
