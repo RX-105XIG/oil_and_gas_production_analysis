@@ -42,7 +42,7 @@ SELECT
     (SELECT SUM(oil_bbl) FROM reeves_leases) * 100 AS pct_from_top_decile;
 ```
 
-# 2. The top single lease significantly outproduces the rest of the field
+# 2. The top single lease significantly outproduces the rest of the field:
 REV GF STATE T7 50 was the top producing lease with 4,440,186 barrels of oil over the period, which is roughly 19.88x the average of 223,343 barrels among producing leases (leases with nonzero oil production).
 ```sql
 SELECT lease_name, lease_no, oil_bbl
@@ -55,7 +55,7 @@ FROM reeves_leases
 WHERE oil_bbl > 0;
 ```
 
-# 3. Leases with zero production are majority disposal/injection wells, not inactive producers
+# 3. Leases with zero production are majority disposal/injection wells, not inactive producers:
 1,275 leases (21.39% of the dataset) showed zero recorded oil, gas, and condensate production. Of these, 181 (14.20%) had lease names explicitly containing "SWD" or "BRINE," meaning that at least a portion of zero production leases are disposal/injection wells rather than inactive producers. The remaining zero production leases likely include a mix of disposal wells without that naming convention and plugged/abandoned wells.
 ```sql
 SELECT lease_name, lease_no, well_no
@@ -72,7 +72,7 @@ WHERE (oil_bbl = 0 AND casinghead_mcf = 0 AND gw_gas_mcf = 0 AND condensate_bbl 
   AND (lease_name LIKE '%SWD%' OR lease_name LIKE '%BRINE%');
 ```
 
-# 4. Gas to oil ratio varies widely across leases
+# 4. Gas to oil ratio varies widely across leases:
 The highest gas to oil ratio (GOR) lease was BIG GEORGE 180 at 56.26 mcf per barrel (14,399 barrels of oil, 810,069 mcf of gas), suggesting a more gas dominant reservoir compared to typical oil weighted leases in the sample.
 
 -- Note: leases with very low oil volumes were excluded from this ranking (`oil_bbl > 100`) because dividing by a near zero denominator gives extreme ratios that don't reflect actual reservoir characteristics
