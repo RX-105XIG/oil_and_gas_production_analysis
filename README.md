@@ -1,14 +1,14 @@
 # Reeves County Oil & Gas Production Analysis (SQL)
 
 # Overview
-This project analyzes 5 years (2020–2024) of oil, gas, and condensate production data for leases in Reeves County, Texas, using MySQL. The goal was to identify the top producing leases, production concentration, and note nonproducing (disposal/injection) wells within the dataset.
+This project analyzes 5 years (2020–2024) of oil, gas, and condensate production data for leases in Reeves County, Texas, using MySQL. The goal was to identify the top producing leases, production concentration, and make note of nonproducing (disposal/injection) wells.
 
 # Data Source
 - Source: [Texas Railroad Commission (RRC) Online System](https://www.rrc.texas.gov/)
 - Query criteria: Lease-level view, Well Type: Both, County: Reeves, Date Range: Jan 2020 – Dec 2024
 - Rows: 5,962 leases (each row is a 5 year cumulative total per lease)
 
-Note on scope: this dataset reflects cumulative totals per lease, not monthly production, and does not include an operator field. As such, this analysis focuses on cross section comparisons (rankings, ratios, concentration) rather than time trends.
+Scope note: this dataset reflects cumulative totals per lease and not monthly production, and also does not include an operator field. As such, this analysis focuses on cross section comparisons (rankings, ratios, concentration) rather than time trends.
 
 # Schema
 ```sql
@@ -43,7 +43,7 @@ SELECT
 ```
 
 # 2. The top single lease significantly outproduces the rest of the field:
-REV GF STATE T7 50 was the top producing lease with 4,440,186 barrels of oil over the period, which is roughly 19.88x the average of 223,343 barrels among producing leases (leases with nonzero oil production).
+REV GF STATE T7 50 was the top producing lease with 4,440,186 barrels of oil over the period, which is roughly 19.88x the average of 223,343 barrels among producing leases.
 ```sql
 SELECT lease_name, lease_no, oil_bbl
 FROM reeves_leases
@@ -56,7 +56,7 @@ WHERE oil_bbl > 0;
 ```
 
 # 3. Leases with zero production are majority disposal/injection wells, not inactive producers:
-1,275 leases (21.39% of the dataset) showed zero recorded oil, gas, and condensate production. Of these, 181 (14.20%) had lease names explicitly containing "SWD" or "BRINE," meaning that at least a portion of zero production leases are disposal/injection wells rather than inactive producers. The remaining zero production leases likely include a mix of disposal wells without that naming convention and plugged/abandoned wells.
+1,275 leases (21.39% of the dataset) showed zero recorded oil, gas, and condensate production. Of these, 181 (14.20%) had lease names containing "SWD" or "BRINE," which means that at least a portion of zero production leases are disposal/injection wells rather than inactive producers. The remaining zero production leases most likely include a mix of disposal wells without that naming convention as well as plugged/abandoned wells.
 ```sql
 SELECT lease_name, lease_no, well_no
 FROM reeves_leases
@@ -75,7 +75,7 @@ WHERE (oil_bbl = 0 AND casinghead_mcf = 0 AND gw_gas_mcf = 0 AND condensate_bbl 
 # 4. Gas to oil ratio varies widely across leases:
 The highest gas to oil ratio (GOR) lease was BIG GEORGE 180 at 56.26 mcf per barrel (14,399 barrels of oil, 810,069 mcf of gas), suggesting a more gas dominant reservoir compared to typical oil weighted leases in the sample.
 
--- Note: leases with very low oil volumes were excluded from this ranking (`oil_bbl > 100`) because dividing by a near zero denominator gives extreme ratios that don't reflect actual reservoir characteristics
+-- Note: leases with very low oil volumes were excluded from this finding (`oil_bbl > 100`) because dividing by an amount near to zero gives extreme ratios that skew actual reservoir characteristics
 ```sql
 SELECT lease_name, lease_no, oil_bbl,
        (casinghead_mcf + gw_gas_mcf) AS total_gas_mcf,
@@ -90,7 +90,7 @@ LIMIT 20;
 See [`queries.sql`](./queries.sql) for all 8 queries used in this analysis, including summary statistics and multi well lease comparisons.
 
 # Limitations
-- Data is a 5 year cumulative total per lease, not monthly, meaning no time series/decline rate analysis was possible with this dataset.
-- No operator field was included in this query, so operator level comparisons were not performed.
-- District level ranking was included to demonstrate window function syntax (`RANK() OVER (PARTITION BY ...)`), but because the query was filtered to a single county, most leases fall under one district, and the ranking is not a meaningful business insight on its own.
+- Data is a 5 year cumulative total per lease, not monthly, meaning no time series/decline rate analysis was possible.
+- No operator field was included in this query, so operator comparisons were not performed.
+- District level ranking was included to demonstrate window function syntax (`RANK() OVER (PARTITION BY ...)`), but because the query was filtered to a single county most leases fall under one district, and the ranking is not a meaningful business finding by itself.
 
