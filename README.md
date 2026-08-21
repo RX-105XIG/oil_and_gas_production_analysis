@@ -30,7 +30,7 @@ MySQL Workbench, Excel (data cleaning CSV)
 # Key Findings
 
 # 1. Production is highly concentrated among a small number of leases:
-The top 10% of leases by oil production account for a disproportionate share of total oil production across the county.
+The top 10% of leases by oil production account for 76.71% of total oil production across the county.
 ```sql
 WITH ranked AS (
     SELECT lease_name, oil_bbl,
